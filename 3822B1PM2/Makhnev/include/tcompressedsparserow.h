@@ -29,13 +29,21 @@ public:
 	TCompressedSparseRow transpose() const noexcept;
 	const T& get(size_t row, size_t column) const;
 	void set(const T& element, size_t row, size_t column);
-	
+	size_t get_row(size_t index) const {
+		for (size_t i = 1; i < rows.getSize(); i++)
+		{
+			for (size_t j = rows[i-1]; j < rows[i]; j++)
+			{
+				if (j == index)
+					return i - 1;
+			}
+		}
+		throw std::out_of_range("index is not exist");
+	}
 	//matrix to vector operations
-	//TCompressedSparseRow<T> operator+ (const TDynamicVector<T>& vector) const;
 	TDynamicVector<T> operator* (const TDynamicVector<T>& vector) const;
-	//TDynamicVector<T> operator* (const TDynamicVector<T>& vector) const;
 	TCompressedSparseRow<T> operator- (const TDynamicVector<T>& vector) const;
-
+	TCompressedSparseRow operator* (const T& CSR) const;
 private:
 	size_t size;
 	Vector<T> values;
@@ -53,7 +61,6 @@ inline TCompressedSparseRow<T>::operator TDynamicMatrix<T>() const
 		for (size_t j = rows[i-1]; j < rows[i]; j++)
 		{
 			matrix[i-1][columns[j]] = values[j];
-			//matrix.at(i - 1).at(columns[j]) = values[j];
 		}
 	}
 	return matrix;
@@ -121,46 +128,39 @@ inline bool TCompressedSparseRow<T>::operator!=(const TCompressedSparseRow& CSR)
 {
 	return !(*this == CSR)
 }
-//template <typename T>
-//std::ostream& operator<< (std::ostream& stream, const Vector<T>& vector)
-//{
-//	for (size_t i = 0; i < vector.getSize(); i++)
-//	{
-//		stream << std::setw(3) << vector[i];
-//	}
-//	//stream << CSR.values << std::endl << CSR.columns << std::endl << CSR.rows;
-//	return stream;
-//}
+
 template <typename T>
 TCompressedSparseRow<T> TCompressedSparseRow<T>::transpose() const noexcept
 {
 	TCompressedSparseRow CSR_transpose(size);
 	CSR_transpose.rows.clear();
-	for (size_t i = 0; i < columns.getSize(); i++)
+	CSR_transpose.rows.SetCopacity(rows.getSize());
+	CSR_transpose.columns.SetCopacity(columns.getSize());
+	CSR_transpose.values.SetCopacity(values.getSize());
+	size_t columns_size = columns.getSize();
+	size_t rows_size = rows.getSize();
+	for (size_t i = 0; i < size; i++)
 	{
 		bool is_first = true;
-		for (size_t j = 1; j < rows.getSize(); j++)
+		for (size_t j = 1; j < rows_size; j++)
 		{
-			for (size_t k = rows[j - 1]; k < rows[j]; k++)
+			for (size_t k = rows[j-1]; k < rows[j]; k++)
 			{
-				
 				if (columns[k] == i) {
-					CSR_transpose.values.push_back(values[k]);
-					CSR_transpose.columns.push_back(j - 1);
 					if (is_first) {
+						CSR_transpose.rows.push_back(CSR_transpose.values.getSize());
 						is_first = false;
-						CSR_transpose.rows.push_back(CSR_transpose.values.getSize() - 1);
 					}
-					//std::cout << std::endl << (CSR_transpose) << std::endl << std::endl;
+					CSR_transpose.columns.push_back(j - 1);
+					CSR_transpose.values.push_back(values[k]);
 				}
 			}
 		}
 		if (is_first) {
 			CSR_transpose.rows.push_back(CSR_transpose.values.getSize());
 		}
-
 	}
-	//CSR_transpose.rows.push_back(values.getSize());
+	CSR_transpose.rows.push_back(CSR_transpose.values.getSize());
 	return CSR_transpose;
 }
 template<typename T>
@@ -205,57 +205,36 @@ inline void TCompressedSparseRow<T>::set(const T& element, size_t row, size_t co
 	}
 	return;
 }
-//template<typename T>
-//TCompressedSparseRow<T> TCompressedSparseRow<T>::operator+(const TDynamicVector<T>& vector) const
-//{
-//	TCompressedSparseRow<T> result(size);
-//	result.rows.clear();
-//	size_t k = 0;
-//	for (size_t i = 0; i < size; i++)
-//	{
-//		size_t j = 0;
-//		for (; j < size && k < columns.getSize(); j++)
-//		{
-//			if (columns[k] == j) {
-//				result.values.push_back(values[j] + vector[i]);
-//				k++;
-//			}
-//			else
-//			{
-//				result.values.push_back(vector[i]);
-//			}
-//		}
-//		while (j < size)
-//		{
-//			result.values.push_back(vector[i]);
-//			j++;
-//		}
-//	}
-//	return result;
-//}
+
 template<typename T>
 TDynamicVector<T> TCompressedSparseRow<T>::operator* (const TDynamicVector<T>& vector) const
 {
 	TDynamicVector<T> result(size);
-	size_t row = 1;
-	T sum = {};
-	for (size_t i = 0; i < values.getSize();)
+	for (size_t i = 1; i < rows.getSize(); i++)
 	{
-		sum += values[i] * vector[columns[i]];
-		i++;
-		if (row < size && rows[row] == i) {
-			result[row-1] = sum;
-			sum = {};
-			row++;
+		T sum = {};
+		for (size_t j = rows[i-1]; j < rows[i]; j++)
+		{
+			sum += values[j] * vector[columns[j]];
 		}
+		result[i - 1] = sum;
 	}
-	result[row] = sum;
 	return result;
 }
 template<typename T>
 inline TCompressedSparseRow<T> TCompressedSparseRow<T>::operator-(const TDynamicVector<T>& vector) const
 {
 	return *this + (-vector);
+}
+template<typename T>
+inline TCompressedSparseRow<T> TCompressedSparseRow<T>::operator*(const T& scalar) const
+{
+	TCompressedSparseRow result(*this);
+	for (size_t i = 0; i < result.values.getSize(); i++)
+	{
+		result.values[i] *= scalar;
+	}
+	return result;
 }
 template <typename T>
 TCompressedSparseRow<T> TCompressedSparseRow<T>::operator+ (const TCompressedSparseRow& CSR) const
@@ -267,23 +246,25 @@ TCompressedSparseRow<T> TCompressedSparseRow<T>::operator+ (const TCompressedSpa
 	size_t CSR_row_num = 0;
 	size_t k = 0;
 	size_t j = 0;
-	bool is_next_line_this = false;
-	bool is_next_line_CSR = false;
-	result.rows.push_back(0);
+	Vector<size_t> result_rows;
 	while (k < values.getSize() && j < CSR.values.getSize())
 	{
+		this_row_num = get_row(k);
+		CSR_row_num = CSR.get_row(j);
 		if (this_row_num == CSR_row_num) 
 		{
 			if (columns[k] < CSR.columns[j]) 
 			{
 				result.values.push_back(values[k]);
 				result.columns.push_back(columns[k]);
+				result_rows.push_back(this_row_num);
 				k++;
 			}
 			else if(columns[k] > CSR.columns[j]) 
 			{
 				result.values.push_back(CSR.values[j]);
 				result.columns.push_back(CSR.columns[j]);
+				result_rows.push_back(CSR_row_num);
 				j++;
 			}
 			else {
@@ -291,7 +272,9 @@ TCompressedSparseRow<T> TCompressedSparseRow<T>::operator+ (const TCompressedSpa
 				if (sum != 0) {
 					result.values.push_back(sum);
 					result.columns.push_back(columns[k]);
+					result_rows.push_back(this_row_num);
 				}
+				//std::cout << std::endl << result << std::endl;
 				j++;
 				k++;
 			}
@@ -302,42 +285,51 @@ TCompressedSparseRow<T> TCompressedSparseRow<T>::operator+ (const TCompressedSpa
 			{
 				result.values.push_back(values[k]);
 				result.columns.push_back(columns[k]);
+				result_rows.push_back(this_row_num);
 				k++;
 			}
 			else
 			{
 				result.values.push_back(CSR.values[j]);
 				result.columns.push_back(CSR.columns[j]);
+				result_rows.push_back(CSR_row_num);
 				j++;
 			}
 		}
-		while (this_row_num + 1 < size && rows[this_row_num + 1] == k) {
-			is_next_line_this = true;
-			this_row_num++;
-		}
-		while (CSR_row_num + 1 < size && CSR.rows[CSR_row_num + 1] == j) {
-			CSR_row_num++;
-			is_next_line_CSR = true;
-		}
-		if (is_next_line_this && is_next_line_CSR) {
-			result.rows.push_back(result.values.getSize());
-			is_next_line_CSR = false;
-			is_next_line_this = false;
-		}
-	}
-	if ((is_next_line_this || is_next_line_CSR)) {
-		result.rows.push_back(result.values.getSize());
 	}
 	while (k < values.getSize()) {
 		result.values.push_back(values[k]);
 		result.columns.push_back(columns[k]);
+		result_rows.push_back(get_row(k));
 		k++;
 	}
 	while (j < CSR.values.getSize())
 	{
 		result.values.push_back(CSR.values[j]); 
 		result.columns.push_back(CSR.columns[j]);
+		result_rows.push_back(CSR.get_row(j));
 		j++;
+	}
+	size_t num_of_row = 0;
+	size_t start = 0;
+	size_t end = 0;
+	for (size_t i = 0; i < size; i++)
+	{
+		bool is_find = false;
+		for (size_t j = 0; j < result_rows.getSize(); j++)
+		{
+			if (result_rows[j] == i) {
+				if (!is_find) {
+					start = j;
+					result.rows.push_back(j);
+				}
+				end = j;
+				is_find = true;
+			}
+		}
+		if (!is_find) {
+			result.rows.push_back(end+1);
+		}
 	}
 	result.rows.push_back(result.values.getSize());
 	return result;
@@ -352,8 +344,9 @@ inline TCompressedSparseRow<T> TCompressedSparseRow<T>::operator*(const TCompres
 	result.rows.clear();
 	result.rows.push_back(0);
 	size_t rows_size = rows.getSize();
+	size_t CSR_transpose_rows_size = CSR_transpose.rows.getSize();
 	for (size_t j = 1; j < rows_size; j++) {
-		for (size_t i = 1; i < CSR_transpose.rows.getSize(); i++)
+		for (size_t i = 1; i < CSR_transpose_rows_size; i++)
 		{
 			{
 				T sum = {};

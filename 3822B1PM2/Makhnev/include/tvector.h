@@ -67,7 +67,7 @@ public:
 	T& getFront() {
 		return _array[0];
 	}
-	T* begin() { return std::begin(_array); }
+	//T* begin() { return std::begin(_array); }
 	void clear() { size = 0; }
 	void erase(size_t index) {
 		for (size_t i = index + 1; i < size; i++)
@@ -88,6 +88,20 @@ public:
 			tmp._array[i] = _array[i-1];
 		}
 		*this = tmp;
+	}
+	void SetCopacity(size_t copacity) {
+		T* tmp = new T[copacity];
+		if (size > copacity) 
+		{
+			std::copy(_array, _array + copacity, tmp);
+			size = copacity;
+		}
+		else
+		{
+			std::copy(_array, _array + size, tmp);
+		}
+		delete[] _array;
+		_array = tmp;
 	}
 	bool operator==(const Vector<T>& _vector) const;
 	void resize(size_t size);
