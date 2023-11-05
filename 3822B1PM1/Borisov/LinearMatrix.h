@@ -14,7 +14,7 @@ private:
 public:
     LinearMatrix(size_t size = 1) : sz(size) {
         if (sz < 0) {
-            throw out_of_range("Vector size should be greater than zero");
+            throw out_of_range("Matrix size should be greater than zero");
         }
         pMem = new T[sz * sz]();
         for (int i = 0; i < sz * sz; i++) {
