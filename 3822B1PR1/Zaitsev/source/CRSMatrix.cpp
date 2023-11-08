@@ -87,32 +87,51 @@ CRSMatrix CRSMatrix::operator*(const CRSMatrix& o) {
 			int lf = other.row_ind[j + 1] - 1;
 			while ((ks <= kf) && (ls <= lf)) {
 				if (cols[ks] < other.cols[ls]) ks++;
-				else
-					if (cols[ks] > other.cols[ls]) ls++;
-					else {
+				else if (cols[ks] > other.cols[ls]) ls++;
+				else {
 						amount += values[ks] * other.values[ls];
 						ks++; ls++;
-					}
+				}
 			}
-			if (amount > 0) {
+			if (amount != 0) {
 				result.cols.push_back(j);
 				result.values.push_back(amount);
 				result.NZ++;
 			}
 		}
-		result.row_ind.push_back(NZ);
+		result.row_ind.push_back(result.NZ);
 	}
 	return result;
 
 }
 
 ostream& operator<<(ostream& out, const CRSMatrix & v) {
-	out << "Values = { ";
-	for (auto elem : v.values) out << elem << " ";
-	out << "}" << endl << "Cols = { ";
-	for (auto elem : v.cols) out << elem << " ";
-	out << "}" << endl << "RowInds = { ";
-	for (auto elem : v.row_ind) out << elem << " ";
-	out << "}";
+	if (v.N <= 5) {
+		int t_prev = 0;
+		int t = 0;
+		for (int i = 1; i < v.N + 1; i++) {
+			int k = v.row_ind[i] - v.row_ind[i - 1];
+			for (int j = 0; j < v.N; j++) {
+				if ((v.cols[t] == j) && (k > t - t_prev)) {
+					out << v.values[t] << " ";
+					t++;
+				}
+				else out << "0 ";
+			}
+			t_prev = t;
+			out << endl;
+		}
+	}
+	else if (v.NZ <= 100) {
+		out << "Values = { ";
+		for (auto elem : v.values) out << elem << " ";
+		out << "}" << endl << "Cols = { ";
+		for (auto elem : v.cols) out << elem << " ";
+		out << "}" << endl << "RowInds = { ";
+		for (auto elem : v.row_ind) out << elem << " ";
+		out << "}";
+	}
+	else out << "Matrix is too large to be printed";\
+
 	return out;
 }
