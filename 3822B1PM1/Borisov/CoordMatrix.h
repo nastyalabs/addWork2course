@@ -28,7 +28,6 @@ public:
         }
     }
 
-    // TODO: проверка на существование
     void addEl(size_t row, size_t col, T val) {
         if (row < 0 || row >= sz || col < 0 || col >= sz) {
             throw out_of_range("Invalid index");

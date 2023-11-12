@@ -26,19 +26,35 @@ int main() {
 //
 //    cout << duration.count();
 
-    CoordMatrix<int> m1(2);
+//    CoordMatrix<int> m1(2);
+//    m1.addEl(0, 0, 1);
+//    m1.addEl(0, 1, 2);
+//    m1.addEl(1, 0, 3);
+//    m1.addEl(1, 1, 4);
+//
+//    CoordMatrix<int> m2(2);
+//    m2.addEl(0, 0, 5);
+//    m2.addEl(0, 1, 6);
+//    m2.addEl(1, 0, 7);
+//    m2.addEl(1, 1, 8);
+//
+//    CoordMatrix<int> m3 = m1 * m2;
+//    cout << m3;
+
+    CRSMatrix<int> m1(2);
     m1.addEl(0, 0, 1);
     m1.addEl(0, 1, 2);
     m1.addEl(1, 0, 3);
     m1.addEl(1, 1, 4);
 
-    CoordMatrix<int> m2(2);
+    CRSMatrix<int> m2(2);
     m2.addEl(0, 0, 5);
     m2.addEl(0, 1, 6);
     m2.addEl(1, 0, 7);
     m2.addEl(1, 1, 8);
 
-    CoordMatrix<int> m3 = m1 * m2;
+    CRSMatrix<int> m3 = m1 * m2;
     cout << m3;
+
     return 0;
 }
