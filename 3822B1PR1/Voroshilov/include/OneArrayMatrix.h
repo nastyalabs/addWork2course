@@ -1,11 +1,11 @@
-#include <iostream>
+﻿﻿#include <iostream>
 using namespace std;
 
 class OneArrayMatrix
 {
+public:
 	int* array;
 	int n, m;
-public:
 	OneArrayMatrix(int _n, int _m);
 	OneArrayMatrix(OneArrayMatrix& matr);
 	friend istream& operator>>(istream& istr, OneArrayMatrix& matr);

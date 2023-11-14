@@ -32,7 +32,7 @@ CoordinateMatrix::CoordinateMatrix(CoordinateMatrix& matr) : oneArrMatr(matr.one
 
 }
 
-friend ostream& operator<<(ostream& ostr, const CoordinateMatrix& matr)
+ostream& operator<<(ostream& ostr, const CoordinateMatrix& matr)
 {
     ostr << "array: ";
     for (int i = 0; i < matr.nz; i++)

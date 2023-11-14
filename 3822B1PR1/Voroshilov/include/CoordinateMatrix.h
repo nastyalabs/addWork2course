@@ -5,12 +5,13 @@ using namespace std;
 
 class CoordinateMatrix
 {
+public:
     int n, m, nz;
     int* array, * rows, * cols;
     OneArrayMatrix oneArrMatr;
-public:
     CoordinateMatrix(int _n, int _m);
     CoordinateMatrix(OneArrayMatrix& matr);
+    CoordinateMatrix(CoordinateMatrix& matr);
     friend ostream& operator<<(ostream& ostr, const CoordinateMatrix& matr);
     CoordinateMatrix CoordMult(CoordinateMatrix& matr);
 };
