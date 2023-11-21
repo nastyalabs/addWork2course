@@ -16,6 +16,16 @@ OneArrayMatrix::OneArrayMatrix(OneArrayMatrix& matr) : n(matr.n), m(matr.m)
             array[i * m + j] = matr.array[i * m + j];
 }
 
+OneArrayMatrix OneArrayMatrix::OneArrayMult(OneArrayMatrix& matr)
+{
+    OneArrayMatrix res(n, matr.m);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < matr.m; j++)
+            for (int k = 0; k < m; k++)
+                res.array[i * matr.m + j] += array[i * m + k] * matr.array[k * matr.m + j];
+    return res;
+}
+
 istream& operator>>(istream& istr, OneArrayMatrix& matr)
 {
     for (int i = 0; i < matr.n; i++)
@@ -34,14 +44,4 @@ ostream& operator<<(ostream& ostr, const OneArrayMatrix& matr)
     }
     ostr << endl;
     return ostr;
-}
-
-OneArrayMatrix OneArrayMatrix::OneArrayMult(OneArrayMatrix& matr)
-{
-    OneArrayMatrix res(n, matr.m);
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < matr.m; j++)
-            for (int k = 0; k < m; k++)
-                res.array[i * matr.m + j] += array[i * m + k] * matr.array[k * matr.m + j];
-    return res;
 }

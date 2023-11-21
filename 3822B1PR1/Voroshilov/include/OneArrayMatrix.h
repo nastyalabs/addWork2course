@@ -1,4 +1,5 @@
-﻿﻿#include <iostream>
+﻿﻿#pragma once
+#include <iostream>
 using namespace std;
 
 class OneArrayMatrix
@@ -8,7 +9,7 @@ public:
 	int n, m;
 	OneArrayMatrix(int _n, int _m);
 	OneArrayMatrix(OneArrayMatrix& matr);
+	OneArrayMatrix OneArrayMult(OneArrayMatrix& matr);
 	friend istream& operator>>(istream& istr, OneArrayMatrix& matr);
 	friend ostream& operator<<(ostream& ostr, const OneArrayMatrix& matr);
-	OneArrayMatrix OneArrayMult(OneArrayMatrix& matr);
 };

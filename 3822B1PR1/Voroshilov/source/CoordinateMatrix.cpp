@@ -22,8 +22,7 @@ CoordinateMatrix::CoordinateMatrix(OneArrayMatrix& matr) : oneArrMatr(matr), n(m
             {
                 array[ind] = oneArrMatr.array[i * m + j];
                 rows[ind] = i;
-                cols[ind] = j;
-                ind++;
+                cols[ind++] = j;
             }
 }
 

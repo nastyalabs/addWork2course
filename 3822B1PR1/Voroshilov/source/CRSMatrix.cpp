@@ -15,21 +15,24 @@ CRSMatrix::CRSMatrix(OneArrayMatrix& matr) : oneArrMatr(matr), n(matr.n), m(matr
     cols = new int[nz];
     rowIndex = new int[n + 1];
 
-    int iElem = iRow = 0;
+    int iElem = 0;
+    int iRow = 0;
     for (int i = 0; i < n; i++)
     {
         bool rowFlag = true;
         for (int j = 0; j < m; j++)
             if (oneArrMatr.array[i * m + j])
             {
-                array[iElem] = oneArrMatr.array[i * m + j];
-                cols[iElem] = j;
                 if (rowFlag)
-                    rowIndex[iRow] = iElem;
-                iElem++;
-                iRow++;
+                {
+                    rowIndex[iRow++] = iElem;
+                    rowFlag = false;
+                }
+                array[iElem] = oneArrMatr.array[i * m + j];
+                cols[iElem++] = j;
             }
     }
+    rowIndex[n] = nz;
 }
 
 CRSMatrix::CRSMatrix(CRSMatrix& matr) : oneArrMatr(matr.oneArrMatr), n(matr.n), m(matr.m), nz(matr.nz), array(matr.array), cols(matr.cols), rowIndex(matr.rowIndex)
@@ -50,10 +53,10 @@ ostream& operator<<(ostream& ostr, const CRSMatrix& matr)
     ostr << endl;
 
     ostr << "rowIndex: ";
-    for (int i = 0; i < matr.n + 1; i++)
+    for (int i = 0; i < (matr.n + 1); i++)
         ostr << matr.rowIndex[i] << " ";
 
-    ostr << matr.oneArrMatr;
+    ostr << endl << matr.oneArrMatr;
 
     return ostr;
 }
