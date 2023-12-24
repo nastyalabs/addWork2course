@@ -102,27 +102,6 @@ public:
         return 0;
     }
 
-    CRSMatrix operator*(CRSMatrix &m1) {
-        if (sz != m1.sz) {
-            throw "Matrix sizes do not match for multiplication";
-        }
-
-        CRSMatrix res(sz);
-
-        for (size_t i = 0; i < sz; i++) {
-            for (size_t j = 0; j < sz; j++) {
-                T sum = 0;
-                for (size_t k = 0; k < sz; k++) {
-                    sum += (*this).getEl(i, k) * m1.getEl(k, j);
-                }
-                res.addEl(i, j, sum);
-            }
-        }
-
-        return res;
-    }
-
-
     friend ostream &operator<<(ostream &os, CRSMatrix<T> &matrix) {
         for (size_t i = 0; i < matrix.sz; i++) {
             for (size_t j = matrix.row_ind[i]; j < matrix.row_ind[i + 1]; j++) {
