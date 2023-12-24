@@ -1,0 +1,29 @@
+size: 10
+matrix with vector: 1.6e-06
+matrix with xy: 1.5e-06
+matrix with line: 1.5e-06
+
+size: 20
+matrix with vector: 5.6e-06
+matrix with xy: 3.8e-06
+matrix with line: 3.8e-06
+
+size: 30
+matrix with vector: 2.76e-05
+matrix with xy: 1.1e-05
+matrix with line: 1.1e-05
+
+size: 100
+matrix with vector: 0.0005531
+matrix with xy: 4.8e-06
+matrix with line: 4.8e-06
+
+size: 200
+matrix with vector: 0.0039054
+matrix with xy: 5.14e-05
+matrix with line: 5.14e-05
+
+size: 450
+matrix with vector: 0.0623621
+matrix with xy: 0.0006185
+matrix with line: 0.0006185
